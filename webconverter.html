@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Bulk Message Sender</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #25D366;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #128C7E;
+        }
+        .disclaimer {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff8e1;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WhatsApp Bulk Message Sender</h1>
+        
+        <div>
+            <h3>Recipient Phone Numbers</h3>
+            <p>Enter phone numbers with country code (one per line):</p>
+            <textarea id="phoneNumbers" rows="10" placeholder="Example:
+447123456789
+49123456789
+34612345678"></textarea>
+        </div>
+        
+        <div>
+            <h3>Your Message</h3>
+            <textarea id="message" rows="5" placeholder="Enter your message here..."></textarea>
+        </div>
+        
+        <div>
+            <h3>Delay Between Messages (seconds)</h3>
+            <input type="number" id="delay" value="5" min="1">
+        </div>
+        
+        <button id="sendButton">Send Messages</button>
+        
+        <div class="disclaimer">
+            <h3>Important Disclaimer</h3>
+            <p>This tool opens individual WhatsApp chats for each number. You must manually click the send button for each message.</p>
+            <p>Bulk messaging may violate WhatsApp's Terms of Service. Use responsibly and only with recipients who have consented to receive messages from you.</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('sendButton').addEventListener('click', function() {
+            const phoneNumbers = document.getElementById('phoneNumbers').value.split('\n');
+            const message = encodeURIComponent(document.getElementById('message').value);
+            const delay = document.getElementById('delay').value * 1000;
+            
+            if (phoneNumbers.length === 0 || !message) {
+                alert('Please enter at least one phone number and a message');
+                return;
+            }
+            
+            if (!confirm(`This will open ${phoneNumbers.length} WhatsApp chats. Continue?`)) {
+                return;
+            }
+            
+            // Open first chat immediately
+            const firstNumber = phoneNumbers.shift().trim();
+            if (firstNumber) {
+                window.open(`https://wa.me/${firstNumber}?text=${message}`, '_blank');
+            }
+            
+            // Open remaining chats with delay
+            phoneNumbers.forEach((number, index) => {
+                const num = number.trim();
+                if (num) {
+                    setTimeout(() => {
+                        window.open(`https://wa.me/${num}?text=${message}`, '_blank');
+                    }, delay * (index + 1));
+                }
+            });
+            
+            alert(`Opening ${phoneNumbers.length + 1} WhatsApp chats with a ${delay/1000} second delay between each. You must manually send each message.`);
+        });
+    </script>
+</body>
+</html>
